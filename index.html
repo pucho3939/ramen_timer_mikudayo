@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>キャラ付きラーメンタイマー</title>
+
+<style>
+  body {
+    font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: linear-gradient(180deg, #fff7e6, #ffe0b2);
+    text-align: center;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 40px;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  .container {
+    position: relative;
+    display: inline-block;
+  }
+
+  img {
+    width: 320px;
+  }
+
+  .bubble {
+    position: absolute;
+    top: 20px;
+    left: 300px;
+    width: 240px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    font-size: 15px;
+    text-align: left;
+    transform-origin: left center;
+  }
+
+  .bubble::after {
+    content: "";
+    position: absolute;
+    left: -22px;
+    top: 40px;
+    border: 11px solid transparent;
+    border-right-color: #fff;
+  }
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .bubble.pop {
+    animation: pop 0.35s cubic-bezier(.2,1.5,.4,1);
+  }
+
+  #message {
+    min-height: 40px;
+  }
+
+  #time {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 8px 0;
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+    font-size: 16px;
+    padding: 8px;
+    border-radius: 12px;
+    border: none;
+    background: #ff9800;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.5s, transform 0.2s;
+  }
+
+  button:hover {
+    transform: scale(1.03);
+  }
+
+  button.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🍜 ラーメンタイマー</h1>
+
+<div class="container">
+<!--  <img src="character.png" alt="キャラクター"> -->
+  <img src="https://special.goodsmile.info/mikudayo10th/images/img_product_a.png" alt="キャラクター">
+
+
+  <div class="bubble pop" id="bubble">
+    <div id="message">準備はいい？</div>
+    <div id="time">03:00</div>
+    <button id="startBtn" onclick="startTimer()">スタート</button>
+  </div>
+</div>
+
+<script>
+let totalSeconds = 180;
+let timerId = null;
+let talkId = null;
+
+const talks = [
+  "いい感じに待っていこう。",
+  "そろそろいい匂いしてきた？",
+  "フタ、ちゃんと閉めてる？",
+  "今は我慢の時間だよ。",
+  "湯気に注意してね。",
+  "のびないように見張ってるよ。"
+];
+
+function formatTime() {
+  const m = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const s = String(totalSeconds % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function popBubble() {
+  const bubble = document.getElementById("bubble");
+  bubble.classList.remove("pop");
+  void bubble.offsetWidth; // 再描画
+  bubble.classList.add("pop");
+}
+
+function setMessage(text) {
+  document.getElementById("message").textContent = text;
+  popBubble();
+}
+
+function randomTalk() {
+  const msg = talks[Math.floor(Math.random() * talks.length)];
+  setMessage(msg);
+}
+
+function startTimer() {
+  if (timerId) return;
+
+  document.getElementById("startBtn").classList.add("hide");
+  setMessage("スタート！");
+
+  timerId = setInterval(() => {
+    totalSeconds--;
+    document.getElementById("time").textContent = formatTime();
+
+    if (totalSeconds <= 0) {
+      clearInterval(timerId);
+      clearInterval(talkId);
+      setMessage("🍜 できあがり！");
+    }
+  }, 1000);
+
+  talkId = setInterval(randomTalk, 5000);
+}
+</script>
+
+</body>
+</html>
